@@ -94,3 +94,26 @@ func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 	c.JSON(200, gin.H{"success": "user logged out"})
 }
+
+// Read users
+
+func GetUsers(c *gin.Context) {
+	var users []models.User
+
+	config.DB.Find(&users)
+
+	c.JSON(200, gin.H{"data": users})
+
+}
+
+// Get user by ID
+func GetUSerByID(c *gin.Context) {
+	var user models.User
+
+	if err := config.DB.Where("id = ?", c.Param("user_id")).First(&user).Error; err != nil {
+		c.JSON(400, gin.H{"error": "user not find"})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": user})
+}
