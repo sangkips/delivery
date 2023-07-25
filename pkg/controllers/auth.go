@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -9,8 +10,6 @@ import (
 	"github.com/go-delivery/pkg/models"
 	"github.com/go-delivery/pkg/utils"
 )
-
-var jwtkey = []byte("nfdnf5534784nmnmdfj")
 
 // handle login requests from the user
 func Login(c *gin.Context) {
@@ -38,7 +37,9 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"Role": existingUser.Role,
 		"StandardClaims": jwt.StandardClaims{
 			Subject:   existingUser.Email,
@@ -46,21 +47,15 @@ func Login(c *gin.Context) {
 		},
 	})
 
-	// expirationTime := time.Now().Add(5 * time.Minute)
-
-	// claims := &models.Claims{
-
-	// }
-
-	tokenString, err := token.SignedString(jwtkey)
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Can not generate token"})
 		return
 	}
 
-	// c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
-	c.JSON(200, gin.H{"success": tokenString})
+	c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
+	c.JSON(200, gin.H{"success": "successfully logged in"})
 }
 
 func Signup(c *gin.Context) {
@@ -92,54 +87,6 @@ func Signup(c *gin.Context) {
 
 	config.DB.Create(&user)
 	c.JSON(200, gin.H{"success": "User successfully created"})
-}
-
-// Renders home page and user role logged in
-func Home(c *gin.Context) {
-	cookie, err := c.Cookie("token")
-
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	// Parse token used to allow stay in the home page
-	claims, err := utils.ParseToken(cookie)
-
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	if claims.Role != "user" && claims.Role != "admin" {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	c.JSON(200, gin.H{"success": "home page", "role": claims.Role})
-}
-
-func Premium(c *gin.Context) {
-	cookie, err := c.Cookie("token")
-
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	claims, err := utils.ParseToken(cookie)
-
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	if claims.Role != "admin" {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	c.JSON(200, gin.H{"success": "premium page", "role": claims.Role})
 }
 
 // clears the token once user logout
