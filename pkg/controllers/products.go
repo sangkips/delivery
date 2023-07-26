@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-delivery/pkg/config"
 	"github.com/go-delivery/pkg/models"
@@ -44,10 +46,45 @@ func GetProducts(c *gin.Context) {
 
 // Update product
 func UpdateProduct(c *gin.Context) {
-	return
+	var product models.Product
+
+	if err := config.DB.Where("id = ?", c.Param("prod_id")).First(&product).Error; err != nil {
+		c.JSON(400, gin.H{"error": "error updating item"})
+		return
+	}
+
+	// validate the item first
+
+	var item models.Product
+
+	if err := c.ShouldBindJSON(&item); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+	// update product to item
+
+	config.DB.Model(&product).Updates(&item)
+
+	c.JSON(200, gin.H{"success": item})
 }
 
 // Delete product
 func DeleteProduct(c *gin.Context) {
-	return
+	var product models.Product
+
+	var existingProduct models.Product
+	config.DB.Where("id = ?", c.Param("prod_id")).First(&existingProduct)
+
+	// check if product exist
+	if existingProduct.ID == 0 {
+		c.JSON(400, gin.H{"error": "product doesn't exist"})
+		return
+	}
+
+	if err := config.DB.Where("id = ?", c.Param("prod_id")).Find(&product).Error; err != nil {
+		c.JSON(400, gin.H{"error": "error deleting the item"})
+		return
+	}
+
+	config.DB.Delete(&product)
+	c.JSON(http.StatusOK, gin.H{"success": "successfully deleted item"})
 }
