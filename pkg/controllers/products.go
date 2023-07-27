@@ -13,6 +13,7 @@ func CreateProduct(c *gin.Context) {
 	var product models.Product
 
 	if err := c.ShouldBindJSON(&product); err != nil {
+		c.Header("Content-Type", "application/json")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,7 +31,8 @@ func GetProductByID(c *gin.Context) {
 	var product models.Product
 
 	if err := config.DB.Where("id = ?", c.Param("prod_id")).First(&product).Error; err != nil {
-		c.JSON(400, gin.H{"error": "error retrieving item"})
+		c.Header("Content-Type", "application/json")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"item": product})
@@ -49,7 +51,7 @@ func UpdateProduct(c *gin.Context) {
 	var product models.Product
 
 	if err := config.DB.Where("id = ?", c.Param("prod_id")).First(&product).Error; err != nil {
-		c.JSON(400, gin.H{"error": "error updating item"})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -58,6 +60,7 @@ func UpdateProduct(c *gin.Context) {
 	var item models.Product
 
 	if err := c.ShouldBindJSON(&item); err != nil {
+		c.Header("Content-Type", "application/json")
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 	// update product to item
