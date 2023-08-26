@@ -19,7 +19,7 @@ func CreateProduct(c *gin.Context) {
 	}
 
 	// create product
-	item := models.Product{Name: product.Name, Price: product.Price, Description: product.Description}
+	item := models.Product{Name: product.Name, Price: product.Price, Description: product.Description, Brand: product.Brand}
 	config.DB.Create(&item)
 
 	c.JSON(200, gin.H{"item": item})

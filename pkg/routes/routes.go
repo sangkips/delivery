@@ -21,4 +21,20 @@ func AuthenticationRoutes(r *gin.Engine) {
 	r.GET("/product/:prod_id", controllers.GetProductByID)
 	r.PUT("/update/:prod_id", controllers.UpdateProduct)
 	r.DELETE("/product/:prod_id", controllers.DeleteProduct)
+
+	// Shopping cart
+	r.POST("/cart", controllers.AddToCart)
+
+	// Address
+	r.POST("/address", controllers.CreateAddress)
+
+	// Payment
+	r.POST("/payment", controllers.MakePayment)
+
+	// driver
+	r.POST("/add/driver", controllers.AddDriver)
+	r.GET("/drivers", controllers.GetAllDrivers)
+	r.PUT("/update/driver/:id", controllers.UpdateDriver)
+	r.GET("/driver/:id", controllers.GetDriverByID)
+	r.DELETE("/delete/driver/:id", controllers.DeleteDriver)
 }
