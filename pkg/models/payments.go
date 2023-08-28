@@ -2,11 +2,10 @@ package models
 
 import "gorm.io/gorm"
 
-type Payments struct {
+type Payment struct {
 	gorm.Model
-	UserID        string
-	User          *User   `json:"user,omitempty" gorm:"foreignKey:UserID;references:ID"`
-	PaymentID     int     `json:"-"`
-	PaymentMethod string  `json:"payment_method"` // mpesa, cash, card, credit card
-	Amount        float32 `json:"amount"`
+	UserID         string `json:"user_id" gorm:"foreignKey:UserID;references:ID"`
+	PaymentID      int    `json:"-"`
+	Payment_Method string `json:"payment_method"` // mpesa, cash, card, credit card
+	Amount         uint64 `json:"amount"`
 }

@@ -33,8 +33,8 @@ func InitDB(cfg Config) {
 		&models.Product{},
 		&models.Address{},
 		&models.Driver{},
-		&models.Payments{},
-		&models.ShoppingCart{}); err != nil {
+		&models.Payment{},
+		&models.Order{}); err != nil {
 		panic(err)
 	}
 
