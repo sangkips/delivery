@@ -85,7 +85,7 @@ func Signup(c *gin.Context) {
 	}
 
 	config.DB.Create(&user)
-	c.JSON(200, gin.H{"success": "User successfully created"})
+	c.JSON(200, gin.H{"data": user})
 }
 
 // clears the token once user logout
